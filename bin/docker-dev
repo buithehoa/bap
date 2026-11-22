@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Run `docker compose` for the dev stack as the current host user.
+#   bin/docker-dev up --build
+#   bin/docker-dev run --rm web bin/rails console
+#   bin/docker-dev run --rm web bin/rails test
+set -euo pipefail
+export USER_ID="${USER_ID:-$(id -u)}"
+export GROUP_ID="${GROUP_ID:-$(id -g)}"
+exec docker compose "$@"

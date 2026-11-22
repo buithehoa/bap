@@ -1,0 +1,67 @@
+# PostgreSQL. Versions 9.3 and up are supported.
+#
+# Development/test connect to the Postgres in compose.yaml (`docker compose up -d db`).
+# Override with DB_HOST / DB_PORT / DB_USER / DB_PASSWORD (inside compose, DB_HOST=db).
+#
+# Production reads DATABASE_URL (set by `fly postgres attach`). Solid Cache/Queue/Cable
+# use separate databases whose URLs are derived from DATABASE_URL by suffixing the
+# database name (bap -> bap_cache, bap_queue, bap_cable). Override any of them with
+# CACHE_DATABASE_URL / QUEUE_DATABASE_URL / CABLE_DATABASE_URL.
+<%
+  require "uri"
+
+  derived_database_url = lambda do |suffix|
+    explicit = ENV["#{suffix.upcase}_DATABASE_URL"]
+    next explicit if explicit.present?
+
+    base = ENV["DATABASE_URL"]
+    next nil if base.blank?
+
+    uri = URI.parse(base)
+    name = uri.path.to_s.delete_prefix("/")
+    name = "bap_production" if name.empty?
+    uri.path = "/#{name}_#{suffix}"
+    uri.to_s
+  end
+%>
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+local: &local
+  <<: *default
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  port: <%= ENV.fetch("DB_PORT", 5432) %>
+  username: <%= ENV.fetch("DB_USER", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "postgres") %>
+
+development:
+  <<: *local
+  database: bap_development
+
+test:
+  <<: *local
+  database: bap_test
+
+production:
+  primary: &primary_production
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+  cache:
+    <<: *primary_production
+    url: <%= derived_database_url.call("cache") %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    url: <%= derived_database_url.call("queue") %>
+    # Solid Queue's dispatcher, worker and heartbeats share this pool when it runs
+    # inside Puma in async mode.
+    max_connections: <%= ENV.fetch("JOB_DB_POOL", 8) %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    url: <%= derived_database_url.call("cable") %>
+    migrations_paths: db/cable_migrate

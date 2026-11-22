@@ -1,0 +1,39 @@
+# Fly.io config for bap. See README.md "Deploying to Fly.io" for first-time setup.
+# https://fly.io/docs/reference/configuration/
+
+app = "bap"
+primary_region = "sin"
+console_command = "/rails/bin/rails console"
+# 256MB is tight for Rails; swap absorbs spikes instead of OOM-killing the machine.
+swap_size_mb = 512
+
+[build]
+  # Uses ./Dockerfile. bin/docker-entrypoint runs `db:prepare` before the server
+  # starts, so no release_command is needed.
+
+[env]
+  # Thruster listens here and proxies to Puma on 3000. Non-root users can't bind :80 on Fly.
+  HTTP_PORT = "8080"
+  RAILS_MAX_THREADS = "3"
+  # Run Solid Queue inside Puma as threads (no extra process / machine).
+  SOLID_QUEUE_IN_PUMA = "true"
+  SOLID_QUEUE_MODE = "async"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Keep one machine running: Solid Queue jobs (and recurring jobs) run inside it.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "30s"
+    method = "GET"
+    path = "/up"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

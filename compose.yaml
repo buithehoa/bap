@@ -1,0 +1,54 @@
+# Local development stack.
+#   Postgres only (run Rails on the host): docker compose up -d db
+#   Whole app in Docker:                   bin/docker-dev up --build
+# bin/docker-dev wraps `docker compose`, passing your UID/GID so containers
+# don't leave root-owned files in the repo.
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  web: &app
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    command: bash -c "rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    tty: true
+    stdin_open: true
+
+  css:
+    <<: *app
+    command: bin/rails tailwindcss:watch[always]
+    ports: []
+    depends_on: []
+
+volumes:
+  postgres_data:
+  bundle:
