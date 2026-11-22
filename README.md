@@ -1,5 +1,7 @@
 # bap
 
+[![CI](https://github.com/buithehoa/bap/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/buithehoa/bap/actions/workflows/ci.yml)
+
 Rails 8.1.4.1 · Ruby 4.0.10 · PostgreSQL 17 · Hotwire + Tailwind · Solid Queue/Cache/Cable · deployed on Fly.io (`sin`).
 
 ## Local development
