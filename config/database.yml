@@ -50,6 +50,10 @@ production:
   primary: &primary_production
     <<: *default
     url: <%= ENV["DATABASE_URL"] %>
+    # Close connections idle for 60s (Rails default is 300s). The 256MB Fly
+    # Postgres runs short of memory, and every open connection is a backend
+    # process there.
+    idle_timeout: 60
   cache:
     <<: *primary_production
     url: <%= derived_database_url.call("cache") %>
@@ -58,7 +62,7 @@ production:
     <<: *primary_production
     url: <%= derived_database_url.call("queue") %>
     # Solid Queue's dispatcher, worker and heartbeats share this pool when it runs
-    # inside Puma in async mode.
+    # inside Puma in async mode. Needs at least JOB_THREADS + 2.
     max_connections: <%= ENV.fetch("JOB_DB_POOL", 8) %>
     migrations_paths: db/queue_migrate
   cable:
