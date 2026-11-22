@@ -14,10 +14,16 @@ swap_size_mb = 512
 [env]
   # Thruster listens here and proxies to Puma on 3000. Non-root users can't bind :80 on Fly.
   HTTP_PORT = "8080"
-  RAILS_MAX_THREADS = "3"
+  # Kept low on purpose: the Postgres machine has 256MB, and each DB connection
+  # is a Postgres process. Puma threads also size the primary, cache and cable pools.
+  RAILS_MAX_THREADS = "2"
   # Run Solid Queue inside Puma as threads (no extra process / machine).
   SOLID_QUEUE_IN_PUMA = "true"
   SOLID_QUEUE_MODE = "async"
+  # One job thread; the queue pool needs JOB_THREADS + 2 (polling, heartbeat)
+  # plus one for the dispatcher.
+  JOB_THREADS = "1"
+  JOB_DB_POOL = "4"
 
 [http_service]
   internal_port = 8080

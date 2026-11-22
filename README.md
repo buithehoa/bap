@@ -100,4 +100,5 @@ gh secret set FLY_API_TOKEN          # paste it
 ### Not configured yet
 
 - **Email:** no SMTP is set up in production, so password-reset emails fail with `ECONNREFUSED localhost:25`. Configure `config.action_mailer.smtp_settings` in `config/environments/production.rb`. Mailer links use `APP_HOST`, which defaults to `bap.fly.dev`.
+- **Database memory:** the Fly Postgres machine (`bap-db`) has 256MB, and with more connections it ran short of memory. Its health checks failed and the app got `server closed the connection unexpectedly`. So `fly.toml` keeps connections low: `RAILS_MAX_THREADS=2`, `JOB_THREADS=1`, `JOB_DB_POOL=4`, and production closes idle connections after 60s. If `fly checks list -a bap-db` still shows critical, resize it with `fly machine update <id> --vm-memory 512 -a bap-db`.
 - **Memory:** idle is about 130MB and about 160MB under light load in a 256MB container, measured locally. If Fly shows OOM restarts, raise `memory` in `fly.toml` to `512mb`.
