@@ -1,21 +1,19 @@
 require "test_helper"
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
-  test "root is public and offers sign in" do
+  test "root is public and shows the centered heading" do
     get root_path
 
     assert_response :success
-    assert_select "h1", "Bap"
-    assert_select "a[href=?]", new_session_path
+    assert_select "main.items-center.justify-center h1.text-center", "Tập Đều Như Bắp"
   end
 
-  test "root greets a signed-in user and offers sign out" do
-    sign_in_as users(:one)
-
+  test "root hides the sign in / sign out block while it is commented out" do
     get root_path
+    assert_select "a[href=?]", new_session_path, count: 0
 
-    assert_response :success
-    assert_select "p", /one@example\.com/
-    assert_select "form[action=?] button", session_path, "Sign out"
+    sign_in_as users(:one)
+    get root_path
+    assert_select "form[action=?]", session_path, count: 0
   end
 end

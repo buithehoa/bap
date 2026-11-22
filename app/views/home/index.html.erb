@@ -1,15 +1,20 @@
 <% content_for :title, "Bap" %>
+<% content_for :main_class, "min-h-dvh flex items-center justify-center px-4 py-8" %>
 
-<div class="w-full max-w-xl">
-  <h1 class="font-bold text-4xl">Bap</h1>
+<div class="w-full max-w-3xl text-center">
+  <h1 lang="vi" class="font-bold text-4xl sm:text-6xl lg:text-7xl leading-tight text-balance text-center">Tập Đều Như Bắp</h1>
 
-  <% if authenticated? %>
-    <p class="mt-4 text-gray-700">Signed in as <%= Current.user.email_address %></p>
-    <%= button_to "Sign out", session_path, method: :delete,
-          class: "mt-6 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 font-medium cursor-pointer" %>
-  <% else %>
-    <p class="mt-4 text-gray-700">Rails <%= Rails.version %> on Ruby <%= RUBY_VERSION %>.</p>
-    <%= link_to "Sign in", new_session_path,
-          class: "mt-6 inline-block rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+  <%# Sign in / sign out block, temporarily disabled. To restore it, delete the
+      "if false" line below and its matching "end". %>
+  <% if false %>
+    <% if authenticated? %>
+      <p class="mt-4 text-gray-700">Signed in as <%= Current.user.email_address %></p>
+      <%= button_to "Sign out", session_path, method: :delete,
+            class: "mt-6 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 font-medium cursor-pointer" %>
+    <% else %>
+      <p class="mt-4 text-gray-700">Rails <%= Rails.version %> on Ruby <%= RUBY_VERSION %>.</p>
+      <%= link_to "Sign in", new_session_path,
+            class: "mt-6 inline-block rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+    <% end %>
   <% end %>
 </div>
