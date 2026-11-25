@@ -7,8 +7,6 @@
 ![Last commit](https://img.shields.io/github/last-commit/buithehoa/bap)
 [![Fly.io](https://img.shields.io/badge/deployed%20on-Fly.io-8B5CF6)](https://bap.fly.dev)
 
-Rails 8.1.4.1 · Ruby 4.0.10 · PostgreSQL 17 · Hotwire + Tailwind · Solid Queue/Cache/Cable · deployed on Fly.io (`sin`).
-
 ## Local development
 
 Postgres always runs in Docker (`compose.yaml`). Rails can run on the host or in Docker.
