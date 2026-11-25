@@ -32,4 +32,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "#alert[role=alert]", "Sign in to continue."
   end
+
+  test "links to the privacy policy" do
+    get root_path
+    assert_select "a[href=?]", privacy_path
+  end
 end
