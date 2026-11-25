@@ -4,10 +4,14 @@ This file provides guidance to AI coding agents (Claude Code, Codex, etc.) when 
 
 Setup, local dev (host or Docker), CI checks and the Fly.io first-deploy runbook are in `README.md`. Read it rather than duplicating it here. This file covers what the README doesn't.
 
+Machine-specific notes (account names, local paths) live in `AGENTS.local.md` next to this file. It is gitignored and may not exist. Read it if it does.
+
+@AGENTS.local.md
+
 ## Environment gotchas
 
-- **Ruby comes from rvm, not mise.** `.ruby-version` is `ruby-4.0.10`. A non-interactive tool shell can resolve `ruby`/`bundle` to a mise shim that errors with "No version is set for shim: ruby". Run Ruby commands via `bash -ilc 'cd <repo> && …'` or `/home/hoa/.rvm/rubies/ruby-4.0.10/bin/ruby`.
-- **Two `gh` accounts are logged in.** The active one (`buithehoa-teamunify`) has no access to this repo and gets HTTP 403. Prefix repo commands with `GH_TOKEN="$(gh auth token --user buithehoa)"`, or switch with `gh auth switch --user buithehoa`. `git push` goes over SSH and isn't affected.
+- **Ruby comes from rvm, not mise.** `.ruby-version` is `ruby-4.0.10`. A non-interactive tool shell can resolve `ruby`/`bundle` to a mise shim that errors with "No version is set for shim: ruby". Run Ruby commands via `bash -ilc 'cd <repo> && …'` or `~/.rvm/rubies/ruby-4.0.10/bin/ruby`.
+- **More than one `gh` account may be logged in.** If `gh` gets HTTP 403 on this repo, the active account has no access to it. Use the account that owns the repo (the owner in `git remote get-url origin`): prefix repo commands with `GH_TOKEN="$(gh auth token --user <owner>)"`, or run `gh auth switch --user <owner>`. `gh auth status` lists the logged-in accounts, and `AGENTS.local.md` may name them. `git push` goes over SSH and isn't affected.
 - **Every push to `main` deploys to production.** The `deploy` job in `.github/workflows/ci.yml` runs after all CI jobs pass. Use a branch + PR unless the user says to work on `main`.
 - **Postgres must be running for tests:** `docker compose up -d db`.
 

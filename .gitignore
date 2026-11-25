@@ -37,3 +37,6 @@
 !/app/assets/builds/.keep
 
 /docs/superpowers/*
+
+# Machine-specific agent notes (account names, local paths); see AGENTS.md
+/AGENTS.local.md
