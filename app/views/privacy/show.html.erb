@@ -1,0 +1,65 @@
+<% content_for :title, "Privacy · Bap" %>
+<% content_for :main_class, "mx-auto max-w-2xl px-5 py-12" %>
+<% contact = "buithehoa@gmail.com" %>
+
+<article class="space-y-12 text-gray-800 leading-relaxed [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:mt-6 [&_h2]:text-lg [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_p]:mt-2 [&_a]:text-blue-700 [&_a]:underline">
+  <nav class="text-sm"><a href="#vi" lang="vi">Tiếng Việt ↓</a> · <%= link_to "← Bap", root_path %></nav>
+
+  <section lang="en">
+    <h1>Privacy Policy</h1>
+    <p class="text-sm text-gray-500">Last updated: November 25, 2026</p>
+
+    <p>Bap ("Tập Đều Như Bắp", bap.fly.dev) is a small personal project. This page explains what it stores about you and why.</p>
+
+    <h2>What we store</h2>
+    <ul>
+      <li>When you sign in with Google: your Google account ID and your email address. We don't receive your password, and we don't ask for your name, photo or contacts.</li>
+      <li>For each sign-in session: the IP address and browser (user agent) it came from, kept until you sign out.</li>
+      <li>One cookie that keeps you signed in. There are no analytics, advertising or tracking cookies.</li>
+    </ul>
+
+    <h2>How we use it</h2>
+    <p>Only to sign you in and show you your own account. We don't sell your data, share it with anyone, show ads, or use it to train AI models.</p>
+
+    <h2>Where it is kept</h2>
+    <p>In a database on Fly.io servers in Singapore. Google handles the sign-in itself, under <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
+
+    <h2>Deleting your data</h2>
+    <p>We keep your data while your account exists. To delete your account and everything stored about you, email <a href="mailto:<%= contact %>"><%= contact %></a> from the address you sign in with. We delete it within 30 days. You can also remove Bap's access at any time from your Google Account's <a href="https://myaccount.google.com/connections">third-party connections</a> page.</p>
+
+    <h2>Changes</h2>
+    <p>If Bap starts storing anything else, for example activities from Strava or Garmin, this page will be updated before that feature is available, and you will be asked to connect those services separately.</p>
+
+    <h2>Contact</h2>
+    <p><a href="mailto:<%= contact %>"><%= contact %></a></p>
+  </section>
+
+  <section lang="vi" id="vi" class="border-t border-gray-200 pt-12">
+    <h1>Chính sách quyền riêng tư</h1>
+    <p class="text-sm text-gray-500">Cập nhật lần cuối: 25 tháng 11 năm 2026</p>
+
+    <p>Bap ("Tập Đều Như Bắp", bap.fly.dev) là một dự án cá nhân nhỏ. Trang này giải thích Bap lưu những gì về bạn và vì sao.</p>
+
+    <h2>Chúng tôi lưu những gì</h2>
+    <ul>
+      <li>Khi bạn đăng nhập bằng Google: mã tài khoản Google và địa chỉ email của bạn. Chúng tôi không nhận mật khẩu của bạn, và không yêu cầu tên, ảnh hay danh bạ.</li>
+      <li>Với mỗi phiên đăng nhập: địa chỉ IP và trình duyệt (user agent) đã dùng, được giữ đến khi bạn đăng xuất.</li>
+      <li>Một cookie để giữ bạn ở trạng thái đăng nhập. Không có cookie phân tích, quảng cáo hay theo dõi.</li>
+    </ul>
+
+    <h2>Chúng tôi dùng dữ liệu để làm gì</h2>
+    <p>Chỉ để đăng nhập cho bạn và hiển thị tài khoản của chính bạn. Chúng tôi không bán, không chia sẻ dữ liệu của bạn với bất kỳ ai, không hiển thị quảng cáo và không dùng dữ liệu để huấn luyện mô hình AI.</p>
+
+    <h2>Dữ liệu được lưu ở đâu</h2>
+    <p>Trong cơ sở dữ liệu trên máy chủ Fly.io tại Singapore. Việc đăng nhập do Google xử lý, theo <a href="https://policies.google.com/privacy?hl=vi">Chính sách quyền riêng tư của Google</a>.</p>
+
+    <h2>Xóa dữ liệu của bạn</h2>
+    <p>Chúng tôi giữ dữ liệu khi tài khoản của bạn còn tồn tại. Để xóa tài khoản và mọi dữ liệu về bạn, hãy gửi email tới <a href="mailto:<%= contact %>"><%= contact %></a> từ địa chỉ bạn dùng để đăng nhập. Chúng tôi sẽ xóa trong vòng 30 ngày. Bạn cũng có thể gỡ quyền truy cập của Bap bất cứ lúc nào tại trang <a href="https://myaccount.google.com/connections?hl=vi">kết nối với bên thứ ba</a> trong Tài khoản Google.</p>
+
+    <h2>Thay đổi</h2>
+    <p>Nếu Bap bắt đầu lưu thêm dữ liệu khác, ví dụ hoạt động từ Strava hoặc Garmin, trang này sẽ được cập nhật trước khi tính năng đó ra mắt, và bạn sẽ được hỏi riêng khi kết nối các dịch vụ đó.</p>
+
+    <h2>Liên hệ</h2>
+    <p><a href="mailto:<%= contact %>"><%= contact %></a></p>
+  </section>
+</article>
