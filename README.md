@@ -22,7 +22,7 @@ docker compose up -d db   # Postgres 17 on localhost:5432 (postgres/postgres)
 bin/setup                 # installs gems, prepares the DB, starts bin/dev
 ```
 
-Seeds create a dev user: `dev@example.com` / `password` (`bin/rails db:seed`).
+Sign in with Google. See [Google sign-in setup](#google-sign-in-setup).
 
 `config/database.yml` reads `DB_HOST`, `DB_PORT`, `DB_USER` and `DB_PASSWORD`. If something else is on port 5432, run with `DB_PORT=5433 docker compose up -d db` and export `DB_PORT=5433`.
 
@@ -48,6 +48,33 @@ bin/brakeman --no-pager
 bin/bundler-audit
 bin/importmap audit
 ```
+
+## Google sign-in setup
+
+Sign-in is Google only (OmniAuth, `config/initializers/omniauth.rb`). It needs a Google OAuth client:
+
+1. In the [Google Cloud console](https://console.cloud.google.com), create a project. Under **Google Auth Platform**, set up the consent screen: audience **External**, scopes `openid` and `.../auth/userinfo.email`, then **Publish app** so it's **In production**. Don't upload a logo, which triggers brand verification.
+2. Under **Clients**, create a **Web application** client with these authorized redirect URIs:
+   - `http://localhost:3000/auth/google_oauth2/callback`
+   - `https://bap.fly.dev/auth/google_oauth2/callback`
+3. Save the client ID and secret right away, since Google shows the secret only once.
+
+Locally, put them in the gitignored `.env`:
+
+```
+GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxx
+```
+
+`compose.yaml` passes them to the `web` container. On the host, load them first: `set -a; source .env; set +a; bin/dev`.
+
+In production, they're Fly secrets (the leading space keeps the command out of shell history):
+
+```bash
+ fly secrets set --stage -a bap GOOGLE_CLIENT_ID='…' GOOGLE_CLIENT_SECRET='…'   # applied on the next deploy
+```
+
+Tests don't need them, because they fake Google with OmniAuth test mode (`mock_google_auth` in `test/test_helpers/omniauth_test_helper.rb`).
 
 ## Deploying to Fly.io
 
@@ -99,6 +126,5 @@ gh secret set FLY_API_TOKEN          # paste it
 
 ### Not configured yet
 
-- **Email:** no SMTP is set up in production, so password-reset emails fail with `ECONNREFUSED localhost:25`. Configure `config.action_mailer.smtp_settings` in `config/environments/production.rb`. Mailer links use `APP_HOST`, which defaults to `bap.fly.dev`.
 - **Database memory:** the Fly Postgres machine (`bap-db`) has 256MB, and with more connections it ran short of memory. Its health checks failed and the app got `server closed the connection unexpectedly`. So `fly.toml` keeps connections low: `RAILS_MAX_THREADS=2`, `JOB_THREADS=1`, `JOB_DB_POOL=4`, and production closes idle connections after 60s. If `fly checks list -a bap-db` still shows critical, resize it with `fly machine update <id> --vm-memory 512 -a bap-db`.
 - **Memory:** idle is about 130MB and about 160MB under light load in a 256MB container, measured locally. If Fly shows OOM restarts, raise `memory` in `fly.toml` to `512mb`.

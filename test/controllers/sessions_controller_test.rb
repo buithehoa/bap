@@ -52,6 +52,24 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "real request phase sends the browser to Google with this host's callback" do
+    OmniAuth.config.test_mode = false
+    post "/auth/google_oauth2"
+    assert_match %r{\Ahttps://accounts\.google\.com/o/oauth2/auth\?}, response.location
+    assert_includes response.location, "redirect_uri=#{CGI.escape("http://www.example.com/auth/google_oauth2/callback")}"
+  ensure
+    OmniAuth.config.test_mode = true
+  end
+
+  test "real request phase refuses a forged host" do
+    OmniAuth.config.test_mode = false
+    host! "evil.example"
+    post "/auth/google_oauth2"
+    assert_match %r{/auth/failure\?message=invalid_host}, response.location
+  ensure
+    OmniAuth.config.test_mode = true
+  end
+
   test "after sign-in returns to the page originally requested" do
     get dashboard_path(from: "x")
     assert_redirected_to root_path
