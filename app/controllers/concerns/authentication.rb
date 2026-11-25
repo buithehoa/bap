@@ -30,7 +30,8 @@ module Authentication
     end
 
     def request_authentication
-      session[:return_to_after_authenticating] = request.url
+      # Only GET pages can be returned to (e.g. not DELETE /session from a stale tab).
+      session[:return_to_after_authenticating] = request.url if request.get?
       redirect_to root_path, alert: "Sign in to continue."
     end
 

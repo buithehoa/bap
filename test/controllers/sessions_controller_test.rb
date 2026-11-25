@@ -78,6 +78,15 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to dashboard_url(from: "x")
   end
 
+  test "signing out from a stale tab, then signing in, lands on the dashboard" do
+    sign_in_as users(:one)
+    delete session_path
+    delete session_path # second tab, already signed out
+    mock_google_auth(uid: "google-uid-one", email: users(:one).email_address)
+    get "/auth/google_oauth2/callback"
+    assert_redirected_to dashboard_url
+  end
+
   test "rate limited callback redirects home" do
     mock_google_auth(uid: "google-uid-one", email: users(:one).email_address)
     # The test env cache is a null store, so make it report an 11th attempt.

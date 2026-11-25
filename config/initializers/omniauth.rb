@@ -1,6 +1,7 @@
 # Tests get dummy credentials so the real (non-mock) request phase can run.
-google_client_id = ENV.fetch("GOOGLE_CLIENT_ID") { "test-client-id" if Rails.env.test? }
-google_client_secret = ENV.fetch("GOOGLE_CLIENT_SECRET") { "test-client-secret" if Rails.env.test? }
+# .presence: compose sets these to "" when .env doesn't define them.
+google_client_id = ENV["GOOGLE_CLIENT_ID"].presence || ("test-client-id" if Rails.env.test?)
+google_client_secret = ENV["GOOGLE_CLIENT_SECRET"].presence || ("test-client-secret" if Rails.env.test?)
 
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :google_oauth2, google_client_id, google_client_secret, scope: "email"
