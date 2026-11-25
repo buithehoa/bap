@@ -30,8 +30,9 @@ module Authentication
     end
 
     def request_authentication
-      # Only GET pages can be returned to (e.g. not DELETE /session from a stale tab).
-      session[:return_to_after_authenticating] = request.url if request.get?
+      # Only pages that can be fetched again can be returned to: GET, and HEAD,
+      # which Rails routes like GET (not e.g. DELETE /session from a stale tab).
+      session[:return_to_after_authenticating] = request.url if request.get? || request.head?
       redirect_to root_path, alert: "Sign in to continue."
     end
 

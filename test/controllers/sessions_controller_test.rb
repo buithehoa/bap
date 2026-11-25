@@ -78,6 +78,13 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to dashboard_url(from: "x")
   end
 
+  test "after sign-in returns to a page first requested with HEAD" do
+    head dashboard_path(from: "head")
+    mock_google_auth(uid: "google-uid-one", email: users(:one).email_address)
+    get "/auth/google_oauth2/callback"
+    assert_redirected_to dashboard_url(from: "head")
+  end
+
   test "signing out from a stale tab, then signing in, lands on the dashboard" do
     sign_in_as users(:one)
     delete session_path
