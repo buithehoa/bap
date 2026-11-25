@@ -1,0 +1,8 @@
+<%# Flash messages. Pass css: to add classes for the page they sit on. %>
+<% css = local_assigns.fetch(:css, "") %>
+<% if alert = flash[:alert] %>
+  <p id="alert" role="alert" class="py-2 px-3 rounded-lg inline-block font-medium bg-red-50 text-red-700 <%= css %>"><%= alert %></p>
+<% end %>
+<% if notice = flash[:notice] %>
+  <p id="notice" class="py-2 px-3 rounded-lg inline-block font-medium bg-green-50 text-green-700 <%= css %>"><%= notice %></p>
+<% end %>
