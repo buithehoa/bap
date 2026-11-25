@@ -19,8 +19,10 @@ gem "tailwindcss-rails", "~> 4.7.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder", "~> 2.15.1"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-gem "bcrypt", "~> 3.1.22"
+# Sign in with Google [https://github.com/zquestz/omniauth-google-oauth2]
+gem "omniauth", "~> 2.4.2"
+gem "omniauth-google-oauth2", "~> 1.2.3"
+gem "omniauth-rails_csrf_protection", "~> 2.0.1"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
