@@ -13,4 +13,23 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "[data-home-background].fixed.inset-0.bg-cover.bg-center[style*=?]", "/assets/home-corn-"
   end
+
+  test "signed out visitors see the Sign in with Google button" do
+    get root_path
+    assert_select "form[action=?][method=post][data-turbo=false] button", "/auth/google_oauth2", text: "Sign in with Google"
+    assert_select "a[href=?]", dashboard_path, count: 0
+  end
+
+  test "signed in visitors see a link to the dashboard instead" do
+    sign_in_as users(:one)
+    get root_path
+    assert_select "a[href=?]", dashboard_path, text: "Go to dashboard"
+    assert_select "form[action=?]", "/auth/google_oauth2", count: 0
+  end
+
+  test "shows the sign in alert after a protected page redirect" do
+    get dashboard_path
+    follow_redirect!
+    assert_select "#alert[role=alert]", "Sign in to continue."
+  end
 end
