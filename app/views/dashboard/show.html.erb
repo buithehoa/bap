@@ -4,7 +4,25 @@
   <%= render "shared/flash" %>
 
   <h1 class="font-bold text-3xl">Dashboard</h1>
-  <p class="mt-4 text-gray-700">Signed in as <%= Current.user.email_address %></p>
+
+  <div class="mt-4 flex items-center gap-4">
+    <% if Current.user.image_url.present? %>
+      <%= tag.img src: Current.user.image_url, id: "avatar", alt: "", width: 48, height: 48,
+            class: "rounded-full", referrerpolicy: "no-referrer" %>
+    <% end %>
+    <div>
+      <% if Current.user.name.present? %>
+        <p id="account-name" class="font-semibold"><%= Current.user.name %></p>
+      <% end %>
+      <p id="account-email" class="text-gray-700">
+        <% if Current.user.email_address.present? %>
+          Signed in as <%= Current.user.email_address %>
+        <% else %>
+          Signed in with <%= Current.user.provider_name %>
+        <% end %>
+      </p>
+    </div>
+  </div>
 
   <%= button_to "Sign out", session_path, method: :delete,
         class: "mt-6 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 font-medium cursor-pointer" %>

@@ -22,6 +22,8 @@ gem "jbuilder", "~> 2.15.1"
 # Sign in with Google [https://github.com/zquestz/omniauth-google-oauth2]
 gem "omniauth", "~> 2.4.2"
 gem "omniauth-google-oauth2", "~> 1.2.3"
+# Sign in with Facebook [https://github.com/simi/omniauth-facebook]
+gem "omniauth-facebook", "~> 11.0.0"
 gem "omniauth-rails_csrf_protection", "~> 2.0.1"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

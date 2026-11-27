@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   resource :session, only: :destroy
-  # POST /auth/google_oauth2 is handled by the OmniAuth middleware.
-  get "auth/google_oauth2/callback" => "sessions#create"
+  # POST /auth/:provider is handled by the OmniAuth middleware.
+  get "auth/:provider/callback" => "sessions#create",
+      constraints: { provider: Regexp.union(Rails.configuration.x.sign_in_providers) }
   get "auth/failure" => "sessions#failure"
 
   get "dashboard" => "dashboard#show"
