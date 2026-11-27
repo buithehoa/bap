@@ -26,6 +26,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the facebook button is hidden when facebook isn't configured" do
+    # Routes load lazily on the first request (unless eager_load), and the
+    # callback route's constraint reads sign_in_providers when it loads. Load
+    # them first, or later tests in the run would 404 on /auth/facebook/callback.
+    Rails.application.reload_routes_unless_loaded
     original = Rails.configuration.x.sign_in_providers
     Rails.configuration.x.sign_in_providers = %w[google_oauth2]
     get root_path

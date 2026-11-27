@@ -14,6 +14,9 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :facebook, facebook_app_id, facebook_app_secret, scope: "email", info_fields: "name,email", image_size: "normal" if facebook_enabled
 end
 
+# Log through Rails (log/test.log in tests) instead of OmniAuth's own stdout logger.
+OmniAuth.config.logger = Rails.logger
+
 # Redirect to /auth/failure in development too, instead of raising.
 OmniAuth.config.failure_raise_out_environments = []
 
