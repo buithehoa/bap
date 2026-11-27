@@ -1,7 +1,17 @@
 one:
+  provider: google_oauth2
+  uid: google-uid-one
+  name: User One
   email_address: one@example.com
-  google_uid: google-uid-one
+  image_url: https://lh3.googleusercontent.com/a/one
 
 two:
+  provider: google_oauth2
+  uid: google-uid-two
   email_address: two@example.com
-  google_uid: google-uid-two
+
+facebook_no_email:
+  provider: facebook
+  uid: fb-uid-one
+  name: Facebook Person
+  image_url: https://graph.facebook.com/v24.0/fb-uid-one/picture?type=normal

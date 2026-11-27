@@ -7,8 +7,6 @@
 ![Last commit](https://img.shields.io/github/last-commit/buithehoa/bap)
 [![Fly.io](https://img.shields.io/badge/deployed%20on-Fly.io-8B5CF6)](https://bap.fly.dev)
 
-Rails 8.1.4.1 · Ruby 4.0.10 · PostgreSQL 17 · Hotwire + Tailwind · Solid Queue/Cache/Cable · deployed on Fly.io (`sin`).
-
 ## Local development
 
 Postgres always runs in Docker (`compose.yaml`). Rails can run on the host or in Docker.
@@ -22,7 +20,7 @@ docker compose up -d db   # Postgres 17 on localhost:5432 (postgres/postgres)
 bin/setup                 # installs gems, prepares the DB, starts bin/dev
 ```
 
-Sign in with Google. See [Google sign-in setup](#google-sign-in-setup).
+Sign in with Google or Facebook. See [Sign-in setup](#sign-in-setup).
 
 `config/database.yml` reads `DB_HOST`, `DB_PORT`, `DB_USER` and `DB_PASSWORD`. If something else is on port 5432, run with `DB_PORT=5433 docker compose up -d db` and export `DB_PORT=5433`.
 
@@ -49,11 +47,13 @@ bin/bundler-audit
 bin/importmap audit
 ```
 
-## Google sign-in setup
+## Sign-in setup
 
-Sign-in is Google only (OmniAuth, `config/initializers/omniauth.rb`). It needs a Google OAuth client:
+Sign-in is Google or Facebook (OmniAuth, `config/initializers/omniauth.rb`). Each provider has its own accounts: an account is keyed on the provider and its user ID, and emails are never matched across providers. Google needs an OAuth client. Facebook needs a Meta app, and its button stays hidden until `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET` are both set.
 
-1. In the [Google Cloud console](https://console.cloud.google.com), create a project. Under **Google Auth Platform**, set up the consent screen: audience **External**, scopes `openid` and `.../auth/userinfo.email`, then **Publish app** so it's **In production**. Don't upload a logo, which triggers brand verification.
+### Google
+
+1. In the [Google Cloud console](https://console.cloud.google.com), create a project. Under **Google Auth Platform**, set up the consent screen: audience **External**, scopes `openid`, `.../auth/userinfo.email` and `.../auth/userinfo.profile`, then **Publish app** so it's **In production**. Don't upload a logo, which triggers brand verification.
 2. Under **Clients**, create a **Web application** client with these authorized redirect URIs:
    - `http://localhost:3000/auth/google_oauth2/callback`
    - `https://bap.fly.dev/auth/google_oauth2/callback`
@@ -74,7 +74,38 @@ In production, they're Fly secrets (the leading space keeps the command out of s
  fly secrets set --stage -a bap GOOGLE_CLIENT_ID='…' GOOGLE_CLIENT_SECRET='…'   # applied on the next deploy
 ```
 
-Tests don't need them, because they fake Google with OmniAuth test mode (`mock_google_auth` in `test/test_helpers/omniauth_test_helper.rb`).
+### Facebook
+
+1. In [Meta for Developers](https://developers.facebook.com), create an app with the use case **Authenticate and request data from users with Facebook Login**, and request `email` and `public_profile`. No App Review is needed for these.
+2. Under **Facebook Login → Settings**, set **Valid OAuth Redirect URIs** to `https://bap.fly.dev/auth/facebook/callback`.
+3. Under **App settings → Basic**, set:
+   - **App domains:** `bap.fly.dev`
+   - **Privacy Policy URL:** `https://bap.fly.dev/privacy`
+   - **User data deletion → Data deletion instructions URL:** `https://bap.fly.dev/privacy#delete`
+   - the category, icon and contact email.
+4. Switch the app to **Live** only after the privacy page update is deployed, then set the Fly secrets (the leading space keeps the command out of shell history):
+
+   ```bash
+    fly secrets set -a bap FACEBOOK_APP_ID='…' FACEBOOK_APP_SECRET='…'   # restarts the machine so the button appears
+   ```
+
+   The button stays hidden until both `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET` are set.
+5. For local development, use a separate Meta test app, which stays in Development mode, and put its ID and secret in `.env`:
+
+   ```
+   FACEBOOK_APP_ID=xxxx
+   FACEBOOK_APP_SECRET=xxxx
+   ```
+
+   They load the same way as Google's: `compose.yaml` passes them to the `web` container, and on the host you run `set -a; source .env; set +a` first.
+
+   - Meta allows `http://localhost` redirects automatically in Development mode, so don't list one.
+   - In Development mode the photo shows as a silhouette.
+   - The picture endpoint errors for inactive apps, or for apps that haven't completed Meta's Data Use Checkup.
+
+### Tests
+
+Tests don't need any of these credentials, because they fake the providers with OmniAuth test mode (`mock_google_auth` and `mock_facebook_auth` in `test/test_helpers/omniauth_test_helper.rb`).
 
 ## Deploying to Fly.io
 

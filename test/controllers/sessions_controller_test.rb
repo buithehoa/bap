@@ -47,6 +47,66 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id].blank?
   end
 
+  test "facebook callback creates a user without an email and signs in" do
+    mock_facebook_auth(uid: "fb-new", name: "New FB")
+    assert_difference("User.count", 1) { get "/auth/facebook/callback" }
+    assert_redirected_to dashboard_url
+    assert cookies[:session_id].present?
+  end
+
+  test "facebook callback signs in the existing facebook user" do
+    mock_facebook_auth(uid: "fb-uid-one", name: "Same Person")
+    assert_no_difference("User.count") { get "/auth/facebook/callback" }
+    assert_redirected_to dashboard_url
+    assert cookies[:session_id].present?
+  end
+
+  test "google callback stores the name and photo" do
+    mock_google_auth(uid: "google-uid-new", email: "new@example.com", name: "New Person", image: "https://example.com/p.jpg")
+    get "/auth/google_oauth2/callback"
+    user = User.find_by!(provider: "google_oauth2", uid: "google-uid-new")
+    assert_equal "New Person", user.name
+    assert_equal "https://example.com/p.jpg", user.image_url
+  end
+
+  test "cancelling on facebook names facebook in the alert" do
+    OmniAuth.config.mock_auth[:facebook] = :access_denied
+    get "/auth/facebook/callback"
+    follow_redirect!
+    assert_redirected_to root_path
+    assert_equal "Facebook sign-in didn't complete. Try again.", flash[:alert]
+    assert cookies[:session_id].blank?
+  end
+
+  test "failure without a known strategy shows a generic alert" do
+    get "/auth/failure", params: { message: "x", strategy: "twitter" }
+    assert_redirected_to root_path
+    assert_equal "Sign-in didn't complete. Try again.", flash[:alert]
+
+    get "/auth/failure", params: { message: "x" }
+    assert_redirected_to root_path
+    assert_equal "Sign-in didn't complete. Try again.", flash[:alert]
+  end
+
+  test "starting facebook sign-in with GET is not allowed" do
+    get "/auth/facebook"
+    assert_response :not_found
+  end
+
+  test "an unknown provider callback is not routed" do
+    get "/auth/twitter/callback"
+    assert_response :not_found
+  end
+
+  test "real facebook request phase sends the browser to Facebook with this host's callback" do
+    OmniAuth.config.test_mode = false
+    post "/auth/facebook"
+    assert_match %r{\Ahttps://www\.facebook\.com/v24\.0/dialog/oauth\?}, response.location
+    assert_includes response.location, "redirect_uri=#{CGI.escape("http://www.example.com/auth/facebook/callback")}"
+  ensure
+    OmniAuth.config.test_mode = true
+  end
+
   test "starting google sign-in with GET is not allowed" do
     get "/auth/google_oauth2"
     assert_response :not_found
@@ -56,6 +116,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     OmniAuth.config.test_mode = false
     post "/auth/google_oauth2"
     assert_match %r{\Ahttps://accounts\.google\.com/o/oauth2/auth\?}, response.location
+    assert_match(/scope=email(\+|%20)profile/, response.location)
     assert_includes response.location, "redirect_uri=#{CGI.escape("http://www.example.com/auth/google_oauth2/callback")}"
   ensure
     OmniAuth.config.test_mode = true

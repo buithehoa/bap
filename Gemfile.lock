@@ -230,6 +230,9 @@ GEM
       logger
       rack (>= 2.2.8)
       rack-protection (>= 2.2.0)
+    omniauth-facebook (11.0.0)
+      bigdecimal
+      omniauth-oauth2 (>= 1.2, < 3)
     omniauth-google-oauth2 (1.2.3)
       jwt (>= 2.9.2, < 4)
       oauth2 (~> 2.0)
@@ -458,6 +461,7 @@ DEPENDENCIES
   importmap-rails (~> 2.2.3)
   jbuilder (~> 2.15.1)
   omniauth (~> 2.4.2)
+  omniauth-facebook (~> 11.0.0)
   omniauth-google-oauth2 (~> 1.2.3)
   omniauth-rails_csrf_protection (~> 2.0.1)
   pg (~> 1.7.0)
@@ -565,6 +569,7 @@ CHECKSUMS
   nokogiri (1.19.7-x86_64-linux-musl) sha256=464d1f3dfb0d53cf54c0c6a7e23e8e91cf68ec3cafc2b27dc4a7682f2d9bf546
   oauth2 (2.1.0) sha256=69925a45030c231cdca3ef4a54a8e848e5319f12c3fdbbfa5065dfbeb4efe835
   omniauth (2.4.2) sha256=c2c94fa578de19a4eb90150c96cd80c316ceb6e067d4fd1c7921048dcc882a65
+  omniauth-facebook (11.0.0) sha256=f7b026a926b1b2e329b1e433bd940dfa2ed34bef17f87a86ecd19c6b356c0fa7
   omniauth-google-oauth2 (1.2.3) sha256=bdbab67e64e50b7902eee2dcfc2225575cefba15ab89a3b6e92c8947987c1da9
   omniauth-oauth2 (1.10.1) sha256=3f0055baa46c83706e621c67b496864df826f00d1ae153b9cfd9ba8b8ea8d2a3
   omniauth-rails_csrf_protection (2.0.1) sha256=c6e3204d7e3925bb537cb52d50fdfc9f05293f1a9d87c5d4ab4ca3a39ba8c32d

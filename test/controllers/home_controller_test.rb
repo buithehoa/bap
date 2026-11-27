@@ -20,11 +20,27 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", dashboard_path, count: 0
   end
 
+  test "signed out visitors see the Continue with Facebook button" do
+    get root_path
+    assert_select "form[action=?][method=post][data-turbo=false] button", "/auth/facebook", text: "Continue with Facebook"
+  end
+
+  test "the facebook button is hidden when facebook isn't configured" do
+    original = Rails.configuration.x.sign_in_providers
+    Rails.configuration.x.sign_in_providers = %w[google_oauth2]
+    get root_path
+    assert_select "form[action=?]", "/auth/facebook", count: 0
+    assert_select "form[action=?]", "/auth/google_oauth2"
+  ensure
+    Rails.configuration.x.sign_in_providers = original
+  end
+
   test "signed in visitors see a link to the dashboard instead" do
     sign_in_as users(:one)
     get root_path
     assert_select "a[href=?]", dashboard_path, text: "Go to dashboard"
     assert_select "form[action=?]", "/auth/google_oauth2", count: 0
+    assert_select "form[action=?]", "/auth/facebook", count: 0
   end
 
   test "shows the sign in alert after a protected page redirect" do
